@@ -1,5 +1,7 @@
 package Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -17,6 +19,15 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.get("example-endpoint", this::exampleHandler);
+        app.post("/login", this::postAccountHandler);
+        app.post("/register", this::postAccountHandler);
+        app.get("/messages", this::getAllMessageHandler);
+        app.post("/messages", this::postMessageHandler);
+        app.get("/messages/{message_id}", this::postMessageHandler);
+        app.delete("/messages/{message_id}", this::deleteMessageHandler);
+        app.patch("/messages/{message_id}", this::patchMessageHandler);
+        app.get("/accounts/{account_id}/messages", this::getAllMessageHandler);
+
 
         return app;
     }
@@ -30,4 +41,23 @@ public class SocialMediaController {
     }
 
 
+    private void postAccountHandler(Context cxt) throws JsonProcessingException{
+
+    }
+
+    private void getAllMessageHandler(Context cxt){
+
+    }
+
+    private void postMessageHandler(Context cxt) throws JsonProcessingException{
+
+    }
+
+    private void deleteMessageHandler(Context cxt){
+
+    }
+
+    private void patchMessageHandler(Context cxt){
+
+    }
 }
