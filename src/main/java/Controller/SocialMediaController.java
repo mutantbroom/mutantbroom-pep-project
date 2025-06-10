@@ -1,7 +1,16 @@
 package Controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import Model.Account;
+import Model.Message;
+import Service.AccountService;
+import Service.MessageService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper; 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -19,14 +28,14 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.get("example-endpoint", this::exampleHandler);
-        app.post("/login", this::postAccountHandler);
+        app.post("/login", this::loginHandler);
         app.post("/register", this::postAccountHandler);
         app.get("/messages", this::getAllMessageHandler);
-        app.post("/messages", this::postMessageHandler);
-        app.get("/messages/{message_id}", this::postMessageHandler);
+        app.post("/messages", this::newMessageHandler);
+        app.get("/messages/{message_id}", this::MessageByIdHandler);
         app.delete("/messages/{message_id}", this::deleteMessageHandler);
         app.patch("/messages/{message_id}", this::patchMessageHandler);
-        app.get("/accounts/{account_id}/messages", this::getAllMessageHandler);
+        app.get("/accounts/{account_id}/messages", this::MessageByUserHandler);
 
 
         return app;
@@ -39,25 +48,81 @@ public class SocialMediaController {
     private void exampleHandler(Context context) {
         context.json("sample text");
     }
+    
+    private void loginHandler(Context context) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(context.body(), Account.class);
+        Account loginAccount = accountService.login(account);
+        if(loginAccount != null){
+            context.json(loginAccount);
+        }else{
+            context.status(401);
+        }
+    }
 
 
     private void postAccountHandler(Context cxt) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(cxt.body(), Account.class);
+        Account registerAccount = accountService.registerAccount(account);
+        if(registerAccount != null){
+            cxt.json(mapper.writeValueAsString(registerAccount));
+        }else{
+            cxt.status(400);
+        }
 
+    }
+    private void newMessageHandler(Context cxt) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(cxt.body(), Message.class);
+        Message newMessage = messageService.newMessage(message);
+        if(newMessage != null){
+            cxt.json(mapper.writeValueAsString(newMessage));
+        }else{
+            cxt.status(400);
+        }
     }
 
     private void getAllMessageHandler(Context cxt){
+        List<Message> message = messageService.getAllMessages();
+        cxt.json(message);
 
     }
 
-    private void postMessageHandler(Context cxt) throws JsonProcessingException{
+    private void MessageByIdHandler(Context cxt) throws JsonProcessingException{
+        int id = Integer.parseInt(cxt.pathParam("message_id"));
+        Message message = messageService.getMessageByID(id);
+        if(message != null){
+            cxt.json(message);
+        }
 
     }
 
     private void deleteMessageHandler(Context cxt){
+        int id = Integer.parseInt(cxt.pathParam("message_id"));
+        Message delMessage = messageService.deleteMessage(id);
+        if(delMessage != null){
+            cxt.json(delMessage);
+        }
 
     }
 
     private void patchMessageHandler(Context cxt){
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(cxt.body(), Message.class);
+        int id = Integer.parseInt(cxt.pathParam("message_id"));
+        Message updatedMessage = messageService.updateMessage(id, message);
+        if(updatedMessage != null){
+            cxt.json(updatedMessage);
+        }else{
+            cxt.status(400);
+        }
 
+    }
+
+    private void MessageByUserHandler(Context cxt){
+        int id = Integer.parseInt(cxt.pathParam("account_id"));
+        List<Message> message = messageService.getMessagesByUser(id);
+        cxt.json(message);
     }
 }
