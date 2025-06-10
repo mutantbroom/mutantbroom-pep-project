@@ -1,12 +1,11 @@
 package Service;
 
-
-import DAO.accountDAO;
+import DAO.AccountDAO;
 import Model.Account;
 import java.util.List;
 
 public class AccountService {
-
+    //using the Libary mini project AuthorService.java as referance
     AccountDAO accountDAO;
 
     public AccountService(){
