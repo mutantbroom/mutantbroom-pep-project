@@ -60,14 +60,14 @@ public class SocialMediaController {
         context.json("sample text");
     }
     
-    private void loginHandler(Context context) throws JsonProcessingException{
+    private void loginHandler(Context cxt) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
-        Account account = mapper.readValue(context.body(), Account.class);
+        Account account = mapper.readValue(cxt.body(), Account.class);
         Account loginAccount = accountService.login(account);
         if(loginAccount != null){
-            context.json(loginAccount);
+            cxt.json(loginAccount);
         }else{
-            context.status(401);
+            cxt.status(401);
         }
     }
 
@@ -118,15 +118,15 @@ public class SocialMediaController {
 
     }
 
-    private void patchMessageHandler(Context context) throws JsonProcessingException{
+    private void patchMessageHandler(Context cxt) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
-        Message message = mapper.readValue(context.body(), Message.class);
-        int id = Integer.parseInt(context.pathParam("message_id"));
+        Message message = mapper.readValue(cxt.body(), Message.class);
+        int id = Integer.parseInt(cxt.pathParam("message_id"));
         Message updatedMessage = messageService.updateMessage(id, message);
         if(updatedMessage != null){
-            context.json(updatedMessage);
+            cxt.json(updatedMessage);
         }else{
-            context.status(400);
+            cxt.status(400);
         }
 
     }
